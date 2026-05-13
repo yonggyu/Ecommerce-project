@@ -1,5 +1,8 @@
 package io.github.yonggyu.ecommerce.common.response;
 
+import lombok.Getter;
+
+@Getter
 public class ApiResponse<T> {
 
     private boolean success;
@@ -20,15 +23,15 @@ public class ApiResponse<T> {
         return new ApiResponse<>(false, message, null);
     }
 
-    public boolean isSuccess() {
-        return success;
-    }
+//    public boolean isSuccess() {
+//        return success;
+//    }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public T getData() {
-        return data;
-    }
+//    public String getMessage() {
+//        return message;
+//    }
+//
+//    public T getData() {
+//        return data;
+//    }
 }

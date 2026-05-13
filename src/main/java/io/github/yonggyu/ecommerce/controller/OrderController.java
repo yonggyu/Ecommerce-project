@@ -1,8 +1,7 @@
 package io.github.yonggyu.ecommerce.controller;
 
 import io.github.yonggyu.ecommerce.common.response.BaseResponse;
-import io.github.yonggyu.ecommerce.dto.cart.CartItemResponse;
-import io.github.yonggyu.ecommerce.dto.cart.CartResponse;
+import io.github.yonggyu.ecommerce.dto.order.OrderCreateResponse;
 import io.github.yonggyu.ecommerce.dto.order.OrderResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -22,22 +21,15 @@ public class OrderController {
     @PostMapping
     @Operation(summary = "주문 생성")
     @ApiResponse(responseCode = "200", description = "주문 생성 성공")
-    public ResponseEntity<BaseResponse<CartResponse>> createOrder() {
+    public ResponseEntity<BaseResponse<OrderCreateResponse>> createOrder() {
 
-        CartResponse response = new CartResponse(
+        OrderCreateResponse response = new OrderCreateResponse(
                 1L,
-                2L,
-                List.of(
-                        new CartItemResponse(
-                                1L,
-                                "MacBook Air M4",
-                                new BigDecimal("1590000"),
-                                1,
-                                new BigDecimal("1590000")
-                        )
-                ),
-                1,
-                new BigDecimal("1590000")
+                1L,
+                2,
+                new BigDecimal("3180000"),
+                "CREATED",
+                LocalDateTime.now()
         );
 
         return ResponseEntity.ok(

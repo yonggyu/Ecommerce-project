@@ -1,0 +1,42 @@
+package io.github.yonggyu.ecommerce.domain;
+
+import java.math.BigDecimal;
+
+public class CartItem {
+
+    private final Long productId;
+    private final String productName;
+    private final BigDecimal price;
+    private int quantity;
+
+    public CartItem(Long productId, String productName, BigDecimal price, int quantity) {
+        this.productId = productId;
+        this.productName = productName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public BigDecimal getSubtotal() {
+        return price.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    public void changeQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+}

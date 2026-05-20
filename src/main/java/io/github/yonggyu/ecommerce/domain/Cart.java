@@ -1,39 +1,57 @@
 package io.github.yonggyu.ecommerce.domain;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+@Entity
+@Table(name = "carts")
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Cart {
 
-    private final Long id;
-    private final Long userId;
-    private final Map<Long, CartItem> items = new LinkedHashMap<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public Cart(Long id, Long userId) {
-        this.id = id;
-        this.userId = userId;
-    }
+    private Long userId;
 
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
+    @Builder.Default
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> items = new ArrayList<>();
 
     public Collection<CartItem> getItems() {
-        return items.values();
+        return items;
     }
 
     public void addItem(Product product, int quantity) {
         validateQuantity(quantity);
-        CartItem item = items.get(product.getId());
+        CartItem item = findItem(product.getId()).orElse(null);
 
         if (item == null) {
-            items.put(product.getId(), new CartItem(product.getId(), product.getName(), product.getPrice(), quantity));
+            items.add(CartItem.builder()
+                    .cart(this)
+                    .productId(product.getId())
+                    .productName(product.getName())
+                    .price(product.getPrice())
+                    .quantity(quantity)
+                    .build());
             return;
         }
 
@@ -48,13 +66,17 @@ public class Cart {
     }
 
     public void deleteItem(Long productId) {
-        if (items.remove(productId) == null) {
+        CartItem item = findItem(productId)
+                .orElseThrow(() -> new IllegalArgumentException("장바구니 상품을 찾을 수 없습니다."));
+        if (!items.remove(item)) {
             throw new IllegalArgumentException("장바구니 상품을 찾을 수 없습니다.");
         }
     }
 
     private Optional<CartItem> findItem(Long productId) {
-        return Optional.ofNullable(items.get(productId));
+        return items.stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
     }
 
     private void validateQuantity(int quantity) {

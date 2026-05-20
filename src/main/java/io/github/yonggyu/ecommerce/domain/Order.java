@@ -1,68 +1,40 @@
 package io.github.yonggyu.ecommerce.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "orders")
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Order {
 
-    private final Long id;
-    private final Long userId;
-    private final Long productId;
-    private final String productName;
-    private final int quantity;
-    private final BigDecimal totalPrice;
-    private final String status;
-    private final LocalDateTime orderedAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public Order(
-            Long id,
-            Long userId,
-            Long productId,
-            String productName,
-            int quantity,
-            BigDecimal totalPrice,
-            String status,
-            LocalDateTime orderedAt
-    ) {
-        this.id = id;
-        this.userId = userId;
-        this.productId = productId;
-        this.productName = productName;
-        this.quantity = quantity;
-        this.totalPrice = totalPrice;
-        this.status = status;
-        this.orderedAt = orderedAt;
-    }
+    private Long userId;
+    private Long productId;
+    private String productName;
+    private int quantity;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal totalPrice;
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getOrderedAt() {
-        return orderedAt;
-    }
+    private String status;
+    private LocalDateTime orderedAt;
 }

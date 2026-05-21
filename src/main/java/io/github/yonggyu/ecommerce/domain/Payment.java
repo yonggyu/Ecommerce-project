@@ -1,47 +1,38 @@
 package io.github.yonggyu.ecommerce.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "payments")
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Payment {
 
-    private final Long id;
-    private final Long orderId;
-    private final BigDecimal amount;
-    private final String paymentMethod;
-    private final String status;
-    private final LocalDateTime paidAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public Payment(Long id, Long orderId, BigDecimal amount, String paymentMethod, String status, LocalDateTime paidAt) {
-        this.id = id;
-        this.orderId = orderId;
-        this.amount = amount;
-        this.paymentMethod = paymentMethod;
-        this.status = status;
-        this.paidAt = paidAt;
-    }
+    private Long orderId;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal amount;
 
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
+    private String paymentMethod;
+    private String status;
+    private LocalDateTime paidAt;
 }

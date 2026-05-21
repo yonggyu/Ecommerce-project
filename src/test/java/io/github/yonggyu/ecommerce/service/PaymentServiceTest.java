@@ -4,28 +4,25 @@ import io.github.yonggyu.ecommerce.dto.order.OrderCreateRequest;
 import io.github.yonggyu.ecommerce.dto.order.OrderCreateResponse;
 import io.github.yonggyu.ecommerce.dto.payment.PaymentRequest;
 import io.github.yonggyu.ecommerce.dto.payment.PaymentResponse;
-import io.github.yonggyu.ecommerce.repository.OrderRepository;
-import io.github.yonggyu.ecommerce.repository.PaymentRepository;
-import io.github.yonggyu.ecommerce.repository.ProductRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SpringBootTest
+@Transactional
 class PaymentServiceTest {
 
+    @Autowired
     private OrderService orderService;
-    private PaymentService paymentService;
 
-    @BeforeEach
-    void setUp() {
-        ProductService productService = new ProductService(new ProductRepository());
-        orderService = new OrderService(new OrderRepository(), productService);
-        paymentService = new PaymentService(new PaymentRepository(), orderService);
-    }
+    @Autowired
+    private PaymentService paymentService;
 
     @Test
     void requestPayment_paysCreatedOrder() {
@@ -33,7 +30,7 @@ class PaymentServiceTest {
 
         PaymentResponse payment = paymentService.requestPayment(new PaymentRequest(order.getOrderId(), "KAKAO_PAY"));
 
-        assertThat(payment.getPaymentId()).isEqualTo(1L);
+        assertThat(payment.getPaymentId()).isNotNull();
         assertThat(payment.getOrderId()).isEqualTo(order.getOrderId());
         assertThat(payment.getAmount()).isEqualByComparingTo(new BigDecimal("1590000"));
         assertThat(payment.getPaymentMethod()).isEqualTo("KAKAO_PAY");

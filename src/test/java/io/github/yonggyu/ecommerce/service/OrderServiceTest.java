@@ -3,32 +3,31 @@ package io.github.yonggyu.ecommerce.service;
 import io.github.yonggyu.ecommerce.dto.order.OrderCreateRequest;
 import io.github.yonggyu.ecommerce.dto.order.OrderCreateResponse;
 import io.github.yonggyu.ecommerce.dto.order.OrderResponse;
-import io.github.yonggyu.ecommerce.repository.OrderRepository;
-import io.github.yonggyu.ecommerce.repository.ProductRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SpringBootTest
+@Transactional
 class OrderServiceTest {
 
+    @Autowired
     private ProductService productService;
-    private OrderService orderService;
 
-    @BeforeEach
-    void setUp() {
-        productService = new ProductService(new ProductRepository());
-        orderService = new OrderService(new OrderRepository(), productService);
-    }
+    @Autowired
+    private OrderService orderService;
 
     @Test
     void createOrder_createsOrderAndDecreasesStockAtOrderCreation() {
         OrderCreateResponse response = orderService.createOrder(new OrderCreateRequest(7L, 1L, 2));
 
-        assertThat(response.getOrderId()).isEqualTo(1L);
+        assertThat(response.getOrderId()).isNotNull();
         assertThat(response.getUserId()).isEqualTo(7L);
         assertThat(response.getTotalQuantity()).isEqualTo(2);
         assertThat(response.getTotalPrice()).isEqualByComparingTo(new BigDecimal("3180000"));

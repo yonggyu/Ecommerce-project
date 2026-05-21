@@ -4,10 +4,12 @@ import io.github.yonggyu.ecommerce.domain.Product;
 import io.github.yonggyu.ecommerce.dto.product.ProductResponse;
 import io.github.yonggyu.ecommerce.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -17,7 +19,7 @@ public class ProductService {
     }
 
     public List<ProductResponse> getProducts() {
-        return productRepository.findAll()
+        return productRepository.findAllByOrderByIdAsc()
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -32,10 +34,10 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
     }
 
-    public synchronized void decreaseStock(Long productId, int quantity) {
+    @Transactional
+    public void decreaseStock(Long productId, int quantity) {
         Product product = getProduct(productId);
         product.decreaseStock(quantity);
-        productRepository.save(product);
     }
 
     private ProductResponse toResponse(Product product) {

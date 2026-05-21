@@ -2,25 +2,22 @@ package io.github.yonggyu.ecommerce.service;
 
 import io.github.yonggyu.ecommerce.dto.cart.CartItemRequest;
 import io.github.yonggyu.ecommerce.dto.cart.CartResponse;
-import io.github.yonggyu.ecommerce.repository.CartRepository;
-import io.github.yonggyu.ecommerce.repository.ProductRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SpringBootTest
+@Transactional
 class CartServiceTest {
 
+    @Autowired
     private CartService cartService;
-
-    @BeforeEach
-    void setUp() {
-        ProductService productService = new ProductService(new ProductRepository());
-        cartService = new CartService(new CartRepository(), productService);
-    }
 
     @Test
     void getCart_returnsEmptyCart() {

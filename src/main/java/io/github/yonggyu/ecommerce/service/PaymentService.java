@@ -6,10 +6,12 @@ import io.github.yonggyu.ecommerce.dto.payment.PaymentRequest;
 import io.github.yonggyu.ecommerce.dto.payment.PaymentResponse;
 import io.github.yonggyu.ecommerce.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
+@Transactional(readOnly = true)
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -20,6 +22,7 @@ public class PaymentService {
         this.orderService = orderService;
     }
 
+    @Transactional
     public PaymentResponse requestPayment(PaymentRequest request) {
         Long orderId = request != null && request.getOrderId() != null ? request.getOrderId() : 1L;
         String paymentMethod = request != null && request.getPaymentMethod() != null
@@ -27,14 +30,13 @@ public class PaymentService {
                 : "CREDIT_CARD";
 
         Order order = orderService.getOrder(orderId);
-        Payment payment = new Payment(
-                paymentRepository.nextId(),
-                order.getId(),
-                order.getTotalPrice(),
-                paymentMethod,
-                "SUCCESS",
-                LocalDateTime.now()
-        );
+        Payment payment = Payment.builder()
+                .orderId(order.getId())
+                .amount(order.getTotalPrice())
+                .paymentMethod(paymentMethod)
+                .status("SUCCESS")
+                .paidAt(LocalDateTime.now())
+                .build();
 
         return toResponse(paymentRepository.save(payment));
     }

@@ -7,11 +7,13 @@ import io.github.yonggyu.ecommerce.dto.order.OrderCreateResponse;
 import io.github.yonggyu.ecommerce.dto.order.OrderResponse;
 import io.github.yonggyu.ecommerce.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
+@Transactional(readOnly = true)
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -22,6 +24,7 @@ public class OrderService {
         this.productService = productService;
     }
 
+    @Transactional
     public OrderCreateResponse createOrder(OrderCreateRequest request) {
         Long userId = request != null && request.getUserId() != null ? request.getUserId() : 1L;
         Long productId = request != null && request.getProductId() != null ? request.getProductId() : 1L;
@@ -30,16 +33,15 @@ public class OrderService {
         Product product = productService.getProduct(productId);
         productService.decreaseStock(productId, quantity);
 
-        Order order = new Order(
-                orderRepository.nextId(),
-                userId,
-                productId,
-                product.getName(),
-                quantity,
-                product.getPrice().multiply(BigDecimal.valueOf(quantity)),
-                "CREATED",
-                LocalDateTime.now()
-        );
+        Order order = Order.builder()
+                .userId(userId)
+                .productId(productId)
+                .productName(product.getName())
+                .quantity(quantity)
+                .totalPrice(product.getPrice().multiply(BigDecimal.valueOf(quantity)))
+                .status("CREATED")
+                .orderedAt(LocalDateTime.now())
+                .build();
 
         return toCreateResponse(orderRepository.save(order));
     }

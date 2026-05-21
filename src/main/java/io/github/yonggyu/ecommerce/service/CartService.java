@@ -8,11 +8,13 @@ import io.github.yonggyu.ecommerce.dto.cart.CartItemResponse;
 import io.github.yonggyu.ecommerce.dto.cart.CartResponse;
 import io.github.yonggyu.ecommerce.repository.CartRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class CartService {
 
     private final CartRepository cartRepository;
@@ -27,6 +29,7 @@ public class CartService {
         return toResponse(getCartEntity(cartId));
     }
 
+    @Transactional
     public CartResponse addCartItem(Long cartId, CartItemRequest request) {
         Cart cart = getCartEntity(cartId);
         Long productId = request != null && request.getProductId() != null ? request.getProductId() : 1L;
@@ -37,6 +40,7 @@ public class CartService {
         return toResponse(cartRepository.save(cart));
     }
 
+    @Transactional
     public CartResponse updateCartItemQuantity(Long cartId, Long productId, CartItemRequest request) {
         int quantity = request != null && request.getQuantity() != null ? request.getQuantity() : 1;
         Cart cart = getCartEntity(cartId);
@@ -45,6 +49,7 @@ public class CartService {
         return toResponse(cartRepository.save(cart));
     }
 
+    @Transactional
     public void deleteCartItem(Long cartId, Long productId) {
         Cart cart = getCartEntity(cartId);
         cart.deleteItem(productId);
